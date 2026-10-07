@@ -1,8 +1,11 @@
 services:
   - type: web
-    name: autogeist-studio-v4
+    name: autogeist-studio-v4-corect
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     autoDeploy: true
+    envVars:
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=96
