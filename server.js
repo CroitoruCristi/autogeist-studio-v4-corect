@@ -10,6 +10,10 @@ fs.mkdirSync(UP,{recursive:true});fs.mkdirSync(OUT,{recursive:true});
 const upload=multer({dest:UP,limits:{fileSize:250*1024*1024,files:20}});
 app.use(express.static(path.join(__dirname,"public")));
 app.use("/renders",express.static(OUT));
+
+// Render diagnostics + explicit homepage
+app.get("/health",(req,res)=>res.status(200).json({ok:true,app:"Auto Geist Studio V4.1",ffmpeg:"required"}));
+app.get("/",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 function esc(s=""){return String(s).replace(/\\/g,"\\\\").replace(/:/g,"\\:").replace(/'/g,"\\'").replace(/%/g,"\\%").replace(/\n/g," ")}
 function run(args){return new Promise((resolve,reject)=>{const p=spawn("ffmpeg",args);let err="";p.stderr.on("data",d=>err+=d);p.on("close",c=>c===0?resolve():reject(new Error(err.slice(-4000))))})}
 app.post("/api/render",upload.array("clips",20),async(req,res)=>{
@@ -31,4 +35,8 @@ app.post("/api/render",upload.array("clips",20),async(req,res)=>{
   res.json({url:`/renders/${path.basename(final)}`,filename:`AutoGeist_${(meta.model||"Reel").replace(/[^a-z0-9]+/gi,"_")}.mp4`});
  }catch(e){console.error(e);res.status(500).send("Render failed: "+e.message)}
 });
-app.listen(PORT,()=>console.log("Auto Geist Studio V4 on port "+PORT));
+app.get("*",(req,res)=>{
+ if(req.path.startsWith("/api/")) return res.status(404).json({error:"API route not found"});
+ return res.sendFile(path.join(__dirname,"public","index.html"));
+});
+app.listen(PORT,"0.0.0.0",()=>console.log("Auto Geist Studio V4.1 READY on port "+PORT));

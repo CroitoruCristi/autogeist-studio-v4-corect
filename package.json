@@ -1,6 +1,6 @@
 {
-  "name": "autogeist-studio-v4",
-  "version": "4.0.0",
+  "name": "autogeist-studio-v4-1-render",
+  "version": "4.1.0",
   "private": true,
   "scripts": {
     "start": "node server.js"

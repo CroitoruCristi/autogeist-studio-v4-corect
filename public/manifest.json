@@ -1,0 +1,8 @@
+{
+  "name": "Auto Geist Studio V4",
+  "short_name": "AG Studio V4",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070709",
+  "theme_color": "#070709"
+}
