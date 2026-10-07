@@ -1,6 +1,6 @@
 {
-  "name": "autogeist-studio-v4-2-low-memory",
-  "version": "4.2.0",
+  "name": "autogeist-studio-v5-pro-reel",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "start": "node server.js"

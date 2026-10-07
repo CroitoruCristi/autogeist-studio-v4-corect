@@ -20,7 +20,7 @@ const upload=multer({
 app.use(express.static(path.join(__dirname,"public")));
 app.use("/renders",express.static(OUT));
 app.get("/health",(req,res)=>res.status(200).json({
-  ok:true,app:"Auto Geist Studio V4.2 Low Memory",mode:"512MB"
+  ok:true,app:"Auto Geist Studio V5 Pro Reel",mode:"512MB"
 }));
 app.get("/",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 
@@ -71,8 +71,40 @@ app.post("/api/render",upload.array("clips",20),async(req,res)=>{
      rm(input);
    }
 
+   // Branded intro + outro, generated cheaply at 720x1280.
+   const intro=path.join(work,"intro.mp4");
+   const outro=path.join(work,"outro.mp4");
+   const modelIntro=esc(meta.model||"AUTOTURISM");
+   const priceIntro=esc(meta.price||"");
+   const infoIntro=esc([meta.year,meta.km].filter(Boolean).join("  •  "));
+   const cta=esc(meta.contact||"Auto Geist Bucuresti");
+   const font="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf";
+   const introVF=[
+     "drawbox=x=0:y=0:w=iw:h=ih:color=0x08080A:t=fill",
+     `drawtext=fontfile=${font}:text='AUTO':x=(w-text_w)/2-75:y=360:fontsize=52:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='GEIST':x=(w-text_w)/2+95:y=360:fontsize=52:fontcolor=red`,
+     `drawtext=fontfile=${font}:text='${modelIntro}':x=(w-text_w)/2:y=540:fontsize=34:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='${infoIntro}':x=(w-text_w)/2:y=600:fontsize=24:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='${priceIntro}':x=(w-text_w)/2:y=670:fontsize=38:fontcolor=red`
+   ].join(",");
+   await run(["-y","-f","lavfi","-i","color=c=black:s=720x1280:r=30:d=1.4","-vf",introVF,"-an","-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-threads","1",intro],"intro");
+
+   const outroVF=[
+     "drawbox=x=0:y=0:w=iw:h=ih:color=0x08080A:t=fill",
+     `drawtext=fontfile=${font}:text='AUTO':x=(w-text_w)/2-75:y=280:fontsize=54:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='GEIST':x=(w-text_w)/2+100:y=280:fontsize=54:fontcolor=red`,
+     `drawtext=fontfile=${font}:text='RULAJ CERTIFICAT':x=(w-text_w)/2:y=480:fontsize=28:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='LIVRARE LA DOMICILIU':x=(w-text_w)/2:y=540:fontsize=28:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='REVIZIE LA LIVRARE':x=(w-text_w)/2:y=600:fontsize=28:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='GARANTIE 12 LUNI / EXTENSIBILA':x=(w-text_w)/2:y=660:fontsize=25:fontcolor=white`,
+     `drawtext=fontfile=${font}:text='FINANTARE':x=(w-text_w)/2:y=720:fontsize=28:fontcolor=red`,
+     `drawtext=fontfile=${font}:text='${cta}':x=(w-text_w)/2:y=860:fontsize=28:fontcolor=white`
+   ].join(",");
+   await run(["-y","-f","lavfi","-i","color=c=black:s=720x1280:r=30:d=2.5","-vf",outroVF,"-an","-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-threads","1",outro],"outro");
+
    const list=path.join(work,"list.txt");
-   fs.writeFileSync(list,normalized.map(f=>`file '${f.replace(/'/g,"'\\''")}'`).join("\n"));
+   const sequence=[intro,...normalized,outro];
+   fs.writeFileSync(list,sequence.map(f=>`file '${f.replace(/'/g,"'\\''")}'`).join("\n"));
    const joined=path.join(work,"joined.mp4");
 
    // concat is stream-copy, almost no encoding RAM.
@@ -98,7 +130,7 @@ app.post("/api/render",upload.array("clips",20),async(req,res)=>{
      `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='${model}':x=48:y=h-270:fontsize=40:fontcolor=white`,
      `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='${info}':x=48:y=h-200:fontsize=28:fontcolor=white`,
      `drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='${price}':x=48:y=h-145:fontsize=36:fontcolor=red`,
-     "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='Rulaj certificat  •  Finantare  •  Garantie  •  Revizie la livrare':x=48:y=h-72:fontsize=21:fontcolor=white"
+     "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='RULAJ CERTIFICAT  •  LIVRARE  •  REVIZIE  •  GARANTIE  •  FINANTARE':x=48:y=h-72:fontsize=18:fontcolor=white"
    ].join(",");
 
    await run([
@@ -129,4 +161,4 @@ app.get("*",(req,res)=>{
  return res.sendFile(path.join(__dirname,"public","index.html"));
 });
 
-app.listen(PORT,"0.0.0.0",()=>console.log("Auto Geist Studio V4.2 LOW MEMORY READY on port "+PORT));
+app.listen(PORT,"0.0.0.0",()=>console.log("Auto Geist Studio V5 PRO REEL READY on port "+PORT));
