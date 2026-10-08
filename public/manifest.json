@@ -1,8 +1,1 @@
-{
-  "name": "Auto Geist Studio V4",
-  "short_name": "AG Studio V4",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#070709",
-  "theme_color": "#070709"
-}
+{"name":"Auto Geist Studio V6 Stable","short_name":"Auto Geist","start_url":"/","display":"standalone","background_color":"#070709","theme_color":"#e21c25"}

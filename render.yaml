@@ -6,6 +6,3 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     autoDeploy: true
-    envVars:
-      - key: NODE_OPTIONS
-        value: --max-old-space-size=96
